@@ -3,26 +3,32 @@ import argparse
 import hashlib
 
 def get_file_hash(file_path):
+    # Создаем объект хэширования MD5
     hasher = hashlib.md5()
     try:
+        # Открываем файл в режиме чтения бинарных данных ('rb')
         with open(file_path, 'rb') as f:
             while chunk := f.read(8192):
                 hasher.update(chunk)
+        # Возвращаем уникальный "отпечаток" файла
         return hasher.hexdigest()
     except Exception:
+        # Если файл нельзя прочитать (например, нет прав) — возвращаем пустоту
         return None
 
 def main():
+    # Настраиваем прием аргументов из командной строки
     parser = argparse.ArgumentParser()
-    parser.add_argument("path")
+    parser.add_argument("path")# путь к папке, который мы ждем от пользователя
     args = parser.parse_args()
     target_path = args.path
-
+    # Проверка: существует ли вообще такой путь на диске
     if not os.path.exists(target_path):
         print("Путь не найден.")
         return
-
+    # Словарь для хранения хэшей (ключ - хэш, значение - путь)
     hashes = {}
+    # Список для найденных дубликатов
     duplicates = []
 
     print(f"Сканирую папку: {target_path}...")
@@ -52,7 +58,7 @@ def main():
         # Проверяем, есть ли в имени "копия"
         if "копия" in file_path.lower():
             print(f"⚠️ Удаляю дубликат (копию): {file_path}")
-            os.remove(file_path)
+            #os.remove(file_path) # РАСКОММЕНТИРУЙ ДЛЯ УДАЛЕНИЯ
         else:
             print(f"ℹ️ Файл {file_path} является дубликатом, но не содержит слова 'копия', пропускаю.")
 
